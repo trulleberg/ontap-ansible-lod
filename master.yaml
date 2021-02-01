@@ -1,0 +1,25 @@
+#------------------------------------------------------------------------------
+#
+#   Hannes Ansible demo file
+#
+#   CHANGES:
+#   * 20210201 | HB | Initial release
+#------------------------------------------------------------------------------
+
+---
+- hosts: all
+  collections:
+    - netapp.ontap
+  connection: local
+  gather_facts: false
+  name: NetApp Ansible Demo
+
+  vars:
+    login: &login
+      hostname: "{{ na_clustermanagement }}"
+      username: "{{ na_username }}"
+      password: "{{ na_password }}"
+      https: true
+      validate_certs: false
+  # no_log: true
+

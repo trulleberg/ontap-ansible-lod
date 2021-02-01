@@ -1,0 +1,65 @@
+all:
+###############################################################################
+# 
+# 
+#    Global groups
+#
+#
+###############################################################################
+  children:
+    emea:
+      children:
+        germany:
+          children:
+            mainz:
+            berlin:
+    amer:
+      children:
+        usa:
+          children:
+            washington:
+        argentinia:
+          children:
+            buenosaires:
+    apac:
+      children:
+        china:
+          children:
+            peking:
+        japan:
+          children:
+            tokyo:
+
+
+###############################################################################
+# 
+# 
+#    Define Clustes per Location
+#
+#
+###############################################################################
+
+mainz:
+  hosts:
+    cluster01:
+
+
+washington:
+  hosts:
+    cluster02:            
+
+peking:
+  hosts:
+    cluster[10:19]:
+
+###############################################################################
+# 
+# 
+#    Define logic groups
+#
+#
+###############################################################################
+
+production:
+  hosts:
+    cluster1:

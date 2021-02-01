@@ -1,0 +1,7 @@
+# Connection specefic details
+na_username: admin
+na_password: Netapp1!
+
+#Geographic vars
+location: none
+timezone: Etc/UTC
