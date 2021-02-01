@@ -1,6 +1,0 @@
----
-all:
-  children:
-    germany:
-      hosts:
-        declu01:
