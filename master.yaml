@@ -23,3 +23,18 @@
       validate_certs: false
   # no_log: true
 
+  tasks:
+  - include_role:
+      name: initialsetup
+    tags:
+      - day0
+  - include_role:
+      name: day1
+    tags:
+      - day1
+
+
+
+
+
+

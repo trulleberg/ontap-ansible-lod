@@ -1,0 +1,28 @@
+export_policies:
+- name: default
+  vserver: nfs
+  protocol: nfs
+  super_user_security: sys
+  rw_rule: none
+  ro_rule: sys
+  state: present
+  client_match: 192.168.0.0/24
+
+
+- name: rhel1
+  vserver: nfs
+  protocol: nfs
+  super_user_security: sys
+  rw_rule: sys
+  ro_rule: sys
+  state: present
+  client_match: 192.168.0.61
+
+- name: default
+  vserver: nasmulti
+  protocol: nfs
+  super_user_security: sys
+  rw_rule: none
+  ro_rule: sys
+  state: present
+  client_match: 192.168.0.0/24

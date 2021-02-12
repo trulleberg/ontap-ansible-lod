@@ -1,0 +1,34 @@
+---
+- name: Day1 tasks
+  set_fact: 
+    tags: always,day1
+    ansible_connection: local
+    login: &login
+      hostname: "{{ na_clustermanagement }}"
+      username: "{{ na_username }}"
+      password: "{{ na_password }}"
+      validate_certs: false
+      https: true
+      #use_rest: always
+    collections:
+    - netapp.ontap
+  tags: day1
+
+- name: Create Volumes
+  na_ontap_volume:
+    state: "{{ item.state }}"
+    name: "{{ item.name }}"
+    aggregate_name: "{{ item.aggregate }}"
+    size: "{{ item.size }}"
+    size_unit: "{{ item.size_unit | default('gb') }}"
+    space_guarantee: "{{item.space_guarantee | default('none')}}"
+    tiering_policy: "{{item.tiering_policy | default('none')}}"
+    export_policy: "{{item.export_policy | default('default') }}"
+    junction_path: "/{{ item.name }}"
+    percent_snapshot_space: "{{ item.percent_snapshot_space}}"
+    vserver: "{{item.vserver}}"
+    wait_for_completion: True
+    comment: "{{item.comment}}"
+    <<: *login
+  loop: "{{volumes}}"
+  tags: day1

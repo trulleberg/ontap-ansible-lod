@@ -1,0 +1,118 @@
+---
+- set_fact: 
+    ansible_connection: local
+    login: &login
+      hostname: "{{ na_clustermanagement }}"
+      username: "{{ na_username }}"
+      password: "{{ na_password }}"
+      validate_certs: false
+      https: true
+    collections:
+    - netapp.ontap
+
+- name: Create Aggregates and wait 5 minutes until aggregate is online
+  na_ontap_aggregate:
+    state: present
+    service_state: online
+    name: aggr1
+    disk_count: 5
+    wait_for_online: True
+    time_out: 300
+    <<: *login
+
+- name: Create NFS Vserver
+  na_ontap_svm:
+    language: de.UTF-8
+    allowed_protocols: nfs
+    state: present
+    name: nfs
+    snapshot_policy: none
+    root_volume_security_style: unix
+    <<: *login
+  register: nfs_vserver
+
+- name: Adjust Vserver nfs settings
+  na_ontap_nfs:
+    vserver: nfs 
+    nfsv4: enabled 
+    nfsv3: enabled
+    nfsv41: enabled
+    nfsv40_write_delegation: enabled
+    nfsv41_write_delegation: enabled
+    nfsv3_fsid_change: enabled
+    nfsv41_acl: disabled
+    nfsv41_read_delegation: disabled
+    nfsv40_acl: disabled
+    vstorage_state: enabled
+    state: present
+    showmount: enabled
+    service_state: started
+    <<: *login
+
+- name: Adjust default EP for Vserver
+  na_ontap_export_policy_rule:
+    policy_name: default
+    vserver: nfs
+    protocol: nfs
+    super_user_security: any
+    rw_rule: any
+    ro_rule: any
+    state: present
+    client_match: 192.168.0.0/24
+    <<: *login
+
+- name: Create data lif01
+  na_ontap_interface:
+    vserver: nfs
+    interface_name: data01
+    home_node: cluster1-01
+    state: present
+    netmask: 255.255.255.0
+    role: data
+    address: 192.168.0.21
+    home_port: e0c
+    protocols: nfs,cifs
+    <<: *login
+
+- name: Create data lif02
+  na_ontap_interface:
+    vserver: nfs
+    interface_name: data02
+    home_node: cluster1-02
+    state: present
+    netmask: 255.255.255.0
+    role: data
+    address: 192.168.0.22
+    home_port: e0c
+    protocols: nfs,cifs
+    <<: *login
+
+- name: create route
+  na_ontap_net_routes:
+    state: present
+    vserver: nfs
+    <<: *login
+    destination: 0.0.0.0/0
+    gateway: 192.168.0.1
+
+- name: Create FlexVol
+  na_ontap_volume:
+    state: present
+    name: demo
+    is_infinite: False
+    aggregate_name: aggr1
+    size: 10
+    size_unit: gb
+    space_guarantee: none
+    tiering_policy: auto
+    export_policy: default
+    junction_path: /demo
+    percent_snapshot_space: 0
+    vserver: nfs
+    wait_for_completion: True
+    comment: demovol
+    <<: *login
+
+
+
+

@@ -1,0 +1,63 @@
+vservers:
+- name: nfs
+  language: de.UTF-8
+  protocols: nfs
+  state: present
+  snapshot_policy: none
+  root_volume_security_style: unix
+  nfssettings:
+    nfsv4: enabled 
+    nfsv3: enabled
+    nfsv41: enabled
+    nfsv40_write_delegation: enabled
+    nfsv41_write_delegation: enabled
+    nfsv3_fsid_change: enabled
+    nfsv41_acl: disabled
+    nfsv41_read_delegation: disabled
+    nfsv40_acl: disabled
+    vstorage_state: enabled
+    state: present
+    showmount: enabled
+    service_state: started
+  routes:
+    - name: default
+      state: present
+      destination: 0.0.0.0/0
+      gateway: 192.168.0.1
+
+
+- name: cifs
+  language: en.UTF-8
+  protocols: cifs
+  state: present
+  snapshot_policy: default
+  root_volume_security_style: ntfs
+
+- name: nasmulti
+  language: en.UTF-8
+  protocols: cifs,nfs
+  state: present
+  snapshot_policy: default
+  root_volume_security_style: unix
+  nfssettings:
+    nfsv4: disabled 
+    nfsv3: enabled
+    nfsv41: disabled
+    nfsv40_write_delegation: disabled
+    nfsv41_write_delegation: disabled
+    nfsv3_fsid_change: enabled
+    nfsv41_acl: disabled
+    nfsv41_read_delegation: disabled
+    nfsv40_acl: disabled
+    vstorage_state: disabled
+    state: present
+    showmount: enabled
+    service_state: started
+  routes:
+  - name: default
+    state: present
+    destination: 0.0.0.0/0
+    gateway: 192.168.0.1
+
+
+  

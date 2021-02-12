@@ -1,0 +1,142 @@
+---
+- name: Day0 tasks
+  set_fact: 
+    ansible_connection: local
+    login: &login
+      hostname: "{{ na_clustermanagement }}"
+      username: "{{ na_username }}"
+      password: "{{ na_password }}"
+      validate_certs: false
+      https: true
+      #use_rest: always
+    collections:
+    - netapp.ontap
+  tags: day0  
+  
+
+- na_ontap_info:
+    <<: *login
+    gather_subset: 
+      - cluster_node_info
+  register: netapp
+  tags: day0  
+
+
+# There is an issue with missing assettags in some nodes, they have to be set manually
+- name: Rename node
+  netapp.ontap.na_ontap_node:
+    <<: *login
+    from_name: "{{ item.value.node_name  }}"
+    name: "{{ na_clustername }}-{{ '%02d'|format(ansible_loop.index|int) }}" #This makes sure we have $cluster-$towdigitnumber
+  loop: "{{ netapp.ontap_info.cluster_node_info | dict2items }}"
+  loop_control:
+    extended: yes
+  tags: day0
+
+- name: Rename Cluster
+  netapp.ontap.na_ontap_command:
+    <<: *login
+    command:
+      [
+        "cluster",
+        "identity",
+        "modify",
+        "-name",
+        "{{ na_clustername }}",
+        "-location",
+        "{{ location }}",
+        "-contact",
+        "{{ email }}",
+      ]
+    privilege: admin
+  register: cli
+  failed_when: "'Error' in cli.msg"
+  changed_when: "'<cli-result-value>1</cli-result-value>' not in cli.msg"
+  tags: day0
+
+
+- name: Create Aggregates for Cluster
+  na_ontap_aggregate:
+    state: "{{ item.state }}"
+    service_state: online
+    name: "{{ item.nodes |replace('-','_') }}_{{ item.name }}"
+    disk_count: "{{ item.diskcount }}"
+    nodes: "{{item.nodes}}"
+    wait_for_online: True
+    time_out: 300
+    <<: *login
+  loop: "{{aggregates}}"
+  tags: day0
+
+- name: Create Vservers
+  na_ontap_svm:
+    language: "{{ item.language }}"
+    allowed_protocols: "{{ item.protocols }}"
+    state: "{{ item.state }}"
+    name: "{{ item.name }}"
+    snapshot_policy: "{{ item.snapshot_policy }}"
+    root_volume_security_style: "{{ item.root_volume_security_style }}"
+    <<: *login
+  loop: "{{vservers}}"
+  tags: day0
+
+- name: Adjust Vserver nfs settings
+  na_ontap_nfs:
+    vserver: "{{item.name}}" 
+    nfsv4: "{{item.nfssettings.nfsv4}}"
+    nfsv3: "{{item.nfssettings.nfsv3}}"
+    nfsv41: "{{item.nfssettings.nfsv41}}"
+    nfsv40_write_delegation: "{{item.nfssettings.nfsv40_write_delegation}}"
+    nfsv41_write_delegation: "{{item.nfssettings.nfsv41_write_delegation}}"
+    nfsv3_fsid_change: "{{item.nfssettings.nfsv3_fsid_change}}"
+    nfsv41_acl: "{{item.nfssettings.nfsv41_acl}}"
+    nfsv41_read_delegation: "{{item.nfssettings.nfsv41_read_delegation}}"
+    nfsv40_acl: "{{item.nfssettings.nfsv40_acl}}"
+    vstorage_state: "{{item.nfssettings.vstorage_state}}"
+    state: "{{item.nfssettings.state}}"
+    showmount: "{{item.nfssettings.showmount}}"
+    service_state: "{{item.nfssettings.service_state}}"
+    <<: *login
+  loop: "{{ vservers }}"
+  when: item.nfssettings is defined
+  tags: day0
+
+- name: Adjust/Create Export Policies
+  na_ontap_export_policy_rule:
+    policy_name: "{{item.name}}"
+    vserver: "{{item.vserver}}"
+    protocol: "{{item.protocol}}"
+    super_user_security: "{{item.super_user_security}}"
+    rw_rule: "{{item.rw_rule}}"
+    ro_rule: "{{item.ro_rule}}"
+    state: "{{item.state}}"
+    client_match: "{{item.client_match}}"
+    <<: *login
+  loop: "{{ export_policies }}"
+  tags: day0
+
+- name: Create data lif01
+  na_ontap_interface:
+    vserver: "{{ item.vserver }}"
+    interface_name: "{{ item.name }}"
+    home_node: "{{ item.home_node }}"
+    state: "{{ item.state }}"
+    netmask: "{{ item.netmask }}"
+    role: "{{ item.role }}"
+    address: "{{ item.ip }}"
+    home_port: "{{ item.home_port }}"
+    protocols: "{{ item.protocols }}"
+    <<: *login
+  loop: "{{ lifs }}"
+  tags: day0
+
+- name: create routes 
+  na_ontap_net_routes:
+    state: present    
+    vserver: nfs    
+    <<: *login    
+    destination: 0.0.0.0/0    
+    gateway: 192.168.0.1
+  loop: "{{ vservers }}"
+  when: item.routes is defined
+  tags: day0

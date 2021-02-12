@@ -1,0 +1,33 @@
+volumes:
+- name: demo
+  state: present
+  size: 10
+  unit: gb
+  vserver: nfs
+  aggregate: demz01_01_data1
+  percent_snapshot_space: 0
+  comment: "Hannes demovol"
+  export_policy: rhel1
+- name: demo2
+  state: present
+  size: 1
+  unit: gb
+  vserver: nfs
+  aggregate: demz01_01_data1
+  percent_snapshot_space: 0
+  comment: "Hannes demovol2"
+- name: demo
+  state: present
+  size: 10
+  unit: mb
+  vserver: nasmulti
+  aggregate: demz01_02_data2
+  percent_snapshot_space: 0
+  comment: "Hannes demovol3"
+- name: demo1g
+  state: present
+  size: 1
+  vserver: nasmulti
+  aggregate: demz01_02_data2
+  percent_snapshot_space: 0
+  comment: "Hannes demovol3"

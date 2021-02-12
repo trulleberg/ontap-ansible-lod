@@ -1,0 +1,12 @@
+---
+aggregates:
+- name: "data1"
+  diskcount: 5
+  state: present
+  service_state: online
+  nodes: "{{ na_clustername }}-01"
+- name: "data2"
+  diskcount: 5
+  state: present
+  service_state: online
+  nodes: "{{ na_clustername }}-02"

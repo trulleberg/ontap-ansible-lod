@@ -5,3 +5,5 @@ na_password: Netapp1!
 #Geographic vars
 location: none
 timezone: Etc/UTC
+
+#ansible_python_interpreter: /usr/local/bin/python3
