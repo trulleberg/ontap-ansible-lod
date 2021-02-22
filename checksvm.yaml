@@ -1,0 +1,75 @@
+- hosts: all
+  gather_facts: false
+  vars:
+    input: &input
+      hostname: "{{ na_clustermanagement }}"
+      username: "{{ na_username }}"
+      password: "{{ na_password }}"
+      https:          true
+      validate_certs: false
+  collections:
+    - netapp.ontap
+  connection: local
+
+  tasks:
+  - name: Get Ontap Info
+    na_ontap_info:
+      state: info
+      gather_subset:
+        - vserver_info
+        - net_interface_info
+        - net_dns_info
+        - cifs_server_info
+        - nfs_info
+        - iscsi_service_info
+      <<: *input
+    register: netapp
+    tags: always
+
+  - name: debug vservers found
+    debug:
+      var: netapp
+    tags: never,debug
+
+  # - name: HANNES DEMO
+  #   debug:
+  #     msg: "{{vservers |map(attribute='name') | list}}"
+  #   tags: never,debug
+
+  # - meta: end_play
+  
+  - name: debug SVM layout
+    debug:
+      var: vservers
+    tags: nerver,debug
+
+  # - name: Construct the SVM model_
+  #   debug: 
+  #     msg: 
+  #       - "name: {{ netapp.ontap_info.vserver_info[item].vserver_name }}"
+  #       - "protocols: {{netapp.ontap_info.vserver_info[item].disallowed_protocols.protocol}}"
+  #       - "language: {{netapp.ontap_info.vserver_info[item].language}}"
+  #   with_items:
+  #     "{{ netapp.ontap_info.vserver_info }}"
+  #   when:
+  #     netapp.ontap_info.vserver_info[item].vserver_type == "data"
+
+
+  - name: Construct the SVM model
+    set_fact: 
+      vservers_found: "{{ vservers_found  |default([])  
+                              + ['name: ' + netapp.ontap_info.vserver_info[item].vserver_name ] }}"
+    with_items:
+      "{{ netapp.ontap_info.vserver_info }}"
+    when:
+      - netapp.ontap_info.vserver_info[item].vserver_type == "data"
+      - netapp.ontap_info.vserver_info[item].vserver_name not in vservers |map(attribute='name') | list     # Check if a Vserver exists on the cluster but not it the inventory
+    tags: always
+
+  - name: debug SVM layout
+    debug:
+      var: vservers_found
+    tags: nerver,debug
+
+  # plan to add them to the vserver var
+

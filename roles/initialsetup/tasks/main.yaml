@@ -21,8 +21,23 @@
   register: netapp
   tags: day0  
 
+- name: Fix asset tag issue
+  netapp.ontap.na_ontap_command:
+    <<: *login
+    command:
+      [
+        "node",
+        "modify",
+        "-node",
+        "{{ item.value.node_name }}",
+        "-assettag",
+        "{{ 24 | random }}",
+      ]
+  loop: "{{ netapp.ontap_info.cluster_node_info | dict2items }}"
+  tags: always,day0
 
-# There is an issue with missing assettags in some nodes, they have to be set manually
+
+
 - name: Rename node
   netapp.ontap.na_ontap_node:
     <<: *login
