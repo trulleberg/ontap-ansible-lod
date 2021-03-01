@@ -59,8 +59,8 @@
     set_fact: 
       vservers_found: "{{ vservers_found  |default([])  
                               + ['name: ' + netapp.ontap_info.vserver_info[item].vserver_name ] }}"
-    with_items:
-      "{{ netapp.ontap_info.vserver_info }}"
+    loop:
+      "{{ netapp.ontap_info.vserver_info | flatten }}"
     when:
       - netapp.ontap_info.vserver_info[item].vserver_type == "data"
       - netapp.ontap_info.vserver_info[item].vserver_name not in vservers |map(attribute='name') | list     # Check if a Vserver exists on the cluster but not it the inventory
