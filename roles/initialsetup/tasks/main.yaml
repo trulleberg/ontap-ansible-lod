@@ -145,13 +145,13 @@
   loop: "{{ lifs }}"
   tags: day0
 
+
 - name: create routes 
   na_ontap_net_routes:
-    state: present    
-    vserver: nfs    
+    state: "{{item.1.state}}"    
+    vserver: "{{item.0.name}}"
     <<: *login    
-    destination: 0.0.0.0/0    
-    gateway: 192.168.0.1
-  loop: "{{ vservers }}"
-  when: item.routes is defined
+    destination: "{{item.1.destination}}"
+    gateway: "{{item.1.gateway}}"
+  loop: "{{ lookup('subelements', vservers, 'routes', {'skip_missing': True})}}"
   tags: day0

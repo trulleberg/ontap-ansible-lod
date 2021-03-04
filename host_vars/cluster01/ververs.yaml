@@ -24,6 +24,10 @@ vservers:
       state: present
       destination: 0.0.0.0/0
       gateway: 192.168.0.1
+    - name: hannes
+      state: present
+      destination: 192.168.178.0/24
+      gateway: 192.168.178.1
 
 
 - name: cifs
