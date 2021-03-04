@@ -26,12 +26,18 @@
   tasks:
   - include_role:
       name: initialsetup
+      apply:
+        tags:
+          - day0
     tags:
-      - day0
+     - always
   - include_role:
       name: day1
+      apply:
+        tags:
+          - day1
     tags:
-      - day1
+     - always
 
 
 

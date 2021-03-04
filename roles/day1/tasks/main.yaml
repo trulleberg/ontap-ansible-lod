@@ -12,7 +12,7 @@
       #use_rest: always
     collections:
     - netapp.ontap
-  tags: day1
+
 
 - name: Create Volumes
   na_ontap_volume:
@@ -31,4 +31,4 @@
     comment: "{{item.comment}}"
     <<: *login
   loop: "{{volumes}}"
-  tags: day1
+  tags: volumes
