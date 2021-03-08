@@ -57,8 +57,12 @@
 
   - name: Construct the SVM model
     set_fact: 
-      vservers_found: "{{ vservers_found  |default([])  
-                              + ['name: ' + netapp.ontap_info.vserver_info[item].vserver_name ] }}"
+      vservers_found: "{{ (vservers_found  |default([]))  
+                              + [ { 'name': netapp.ontap_info.vserver_info[item].vserver_name, 
+                                    'language': netapp.ontap_info.vserver_info[item].language,
+                                    'protocols': (netapp.ontap_info.vserver_info[item].allowed_protocols.protocol | list),
+                                    'root_volume_security_style': netapp.ontap_info.vserver_info[item].root_volume_security_style,
+                                    'snapshot_policy': netapp.ontap_info.vserver_info[item].snapshot_policy   } ] }}"
     loop:
       "{{ netapp.ontap_info.vserver_info | flatten }}"
     when:
@@ -69,7 +73,23 @@
   - name: debug SVM layout
     debug:
       var: vservers_found
-    tags: nerver,debug
+    tags: never,debug
 
   # plan to add them to the vserver var
+
+  - name: Adding to the VAR
+    set_fact:
+      vservers2: "{{vservers}} + {{item}} "
+    loop: "{{vservers_found}}"
+    tags: always
+
+  - name: show me
+    debug:
+      var: vservers2
+    tags: debug,never
+
+  - copy: 
+      content="{{ vservers2 | to_nice_yaml( width=50, explicit_start=True, explicit_end=True, ident=2) }}" 
+      dest=hannes.yaml
+
 
