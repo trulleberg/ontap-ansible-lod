@@ -62,4 +62,4 @@ peking:
 
 production:
   hosts:
-    cluster1:
+    cluster01:
