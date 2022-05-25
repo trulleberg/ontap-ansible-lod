@@ -1,7 +1,7 @@
 # NetApp Automation Jumpstart
 Welcome to my collection of automation demos. This repository holds my first steps of Ansible Automation, please be aware that this is in an early stage.
 
-Many Thanks to my colleague Adiran, who started this [here](https://github.com/AdrianBronder/ntap-automation)
+Many Thanks to my colleague Adrian, who started this [here](https://github.com/AdrianBronder/ntap-automation)
 
 ## Changes:
 * 20210201 HB Intial release
