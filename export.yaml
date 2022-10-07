@@ -1,0 +1,94 @@
+all:
+  children:
+    amer:
+      children:
+        argentinia:
+          children:
+            buenosaires: {}
+        usa:
+          children:
+            washington:
+              hosts:
+                cluster02:
+                  location: none
+                  na_clustername: uswa01
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: US/Pacific
+    apac:
+      children:
+        china:
+          children:
+            peking:
+              hosts:
+                cluster10:
+                  location: none
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Etc/UTC
+                cluster11:
+                  location: none
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Etc/UTC
+                cluster12:
+                  location: none
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Etc/UTC
+                cluster13:
+                  location: none
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Etc/UTC
+                cluster14:
+                  location: none
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Etc/UTC
+                cluster15:
+                  location: none
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Etc/UTC
+                cluster16:
+                  location: none
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Etc/UTC
+                cluster17:
+                  location: none
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Etc/UTC
+                cluster18:
+                  location: none
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Etc/UTC
+                cluster19:
+                  location: none
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Etc/UTC
+        japan:
+          children:
+            tokyo: {}
+    emea:
+      children:
+        germany:
+          children:
+            berlin: {}
+            mainz:
+              hosts:
+                cluster01:
+                  location: mainz
+                  na_clustermanagement: cluster1.demo.netapp.com
+                  na_clustername: demz01
+                  na_password: Netapp1!
+                  na_username: admin
+                  timezone: Europe/Berlin
+    production:
+      hosts:
+        cluster01: {}
+    ungrouped: {}
