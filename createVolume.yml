@@ -21,7 +21,7 @@
   tasks:
     - name: Create Aggregate
       netapp.ontap.na_ontap_aggregate:
-        <<*: login
+        <<: *login
         name:                       data01
         state:                      present
         disk_count:                 5
@@ -29,7 +29,7 @@
 
     - name: Create Vserver
       netapp.ontap.na_ontap_svm:
-        <<*: login
+        <<: *login
         name:                       "{{ svm.name }}"
         state:                      present
         comment:                    "Ansible demo SVM"
@@ -39,7 +39,7 @@
 
     - name: Create Volume
       netapp.ontap.na_ontap_volume:
-        <<*: login
+        <<: *login
         name:                       "{{ volume.name }}"
         vserver:                    "{{ svm.name }}"
         size:                       "{{ volume.size }}"
