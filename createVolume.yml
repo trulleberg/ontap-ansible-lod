@@ -16,7 +16,7 @@
       name:                         svm01
     volume:
       name:                         datavol01
-      size:                         2G
+      size:                         2                                           # Default unit is G
 
   tasks:
     - name: Create Aggregate
@@ -26,6 +26,7 @@
         state:                      present
         disk_count:                 5
         wait_for_online:            true
+        nodes:                      cluster1-01
 
     - name: Create Vserver
       netapp.ontap.na_ontap_svm:
@@ -43,3 +44,4 @@
         name:                       "{{ volume.name }}"
         vserver:                    "{{ svm.name }}"
         size:                       "{{ volume.size }}"
+        aggregate_name:             "data01"
