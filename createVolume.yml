@@ -1,0 +1,45 @@
+- hosts: cluster01
+  collections:
+    - netapp.ontap
+  connection: local
+  gather_facts: false
+  name: NetApp Ansible Demo
+
+  vars:
+    login: &login
+      hostname:                     "{{ na_clustermanagement }}"
+      username:                     "{{ na_username }}"
+      password:                     "{{ na_password }}"
+      https:                        true
+      validate_certs:               false
+    svm:
+      name:                         svm01
+    volume:
+      name:                         datavol01
+      size:                         2G
+
+  tasks:
+    - name: Create Aggregate
+      netapp.ontap.na_ontap_aggregate:
+        <<*: login
+        name:                       data01
+        state:                      present
+        disk_count:                 5
+        wait_for_online:            true
+
+    - name: Create Vserver
+      netapp.ontap.na_ontap_svm:
+        <<*: login
+        name:                       "{{ svm.name }}"
+        state:                      present
+        comment:                    "Ansible demo SVM"
+        allowed_protocols:
+          - cifs
+          - nfs
+
+    - name: Create Volume
+      netapp.ontap.na_ontap_volume:
+        <<*: login
+        name:                       "{{ volume.name }}"
+        vserver:                    "{{ svm.name }}"
+        size:                       "{{ volume.size }}"
